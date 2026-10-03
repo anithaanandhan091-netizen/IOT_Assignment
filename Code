@@ -1,0 +1,77 @@
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+int gasSensor = A0;
+
+int redLED = 5;
+int yellowLED = 6;
+int greenLED = 7;
+int buzzer = 8;
+
+void setup()
+{
+  pinMode(redLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+  lcd.init();
+  lcd.backlight();
+
+  Serial.begin(9600);
+
+  lcd.setCursor(0, 0);
+  lcd.print("AIR POLLUTION");
+  lcd.setCursor(0, 1);
+  lcd.print("MONITORING");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop()
+{
+  int gasValue = analogRead(gasSensor);
+
+  Serial.print("Gas Level: ");
+  Serial.println(gasValue);
+
+  // All OFF
+  digitalWrite(redLED, LOW);
+  digitalWrite(yellowLED, LOW);
+  digitalWrite(greenLED, LOW);
+  digitalWrite(buzzer, LOW);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Gas Level:");
+  lcd.print(gasValue);
+
+  if (gasValue < 300)
+  {
+    // Low pollution
+    digitalWrite(greenLED, HIGH);
+
+    lcd.setCursor(0, 1);
+    lcd.print("Air: LOW");
+  }
+  else if (gasValue < 600)
+  {
+    // Medium pollution
+    digitalWrite(yellowLED, HIGH);
+
+    lcd.setCursor(0, 1);
+    lcd.print("Air: MEDIUM");
+  }
+  else
+  {
+    // High pollution
+    digitalWrite(redLED, HIGH);
+    digitalWrite(buzzer, HIGH);
+
+    lcd.setCursor(0, 1);
+    lcd.print("Air: HIGH");
+  }
+
+  delay(500);
+}
